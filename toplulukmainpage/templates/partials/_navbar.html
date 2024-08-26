@@ -1,0 +1,26 @@
+<nav role="navigation" class="primary-navigation">
+    <div class="navcont">
+        <img src="{{ site_content.logo.url }}" alt="Logo" width="100px" style="margin-left: 100px;">
+    <input type="checkbox" name="menu" id="menu">
+    <label for="menu" class="menu-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+  </label>
+  <div class="menu">
+    <ul id="img-ul">
+      <li><a href="{% url 'home' %}">ANASAYFA</a></li>
+      <li><a href="">ETKİNLİKLERİMİZ</a></li>
+      <li><a href="#">PROJELERİMİZ</a></li>
+      <li><a href="#">HAKKIMIZDA</a></li>
+      <li><a href="#">TOPLULUKLAR &dtrif;</a>
+        <ul class="dropdown dropdown-trigger">
+          {% for community in communities %}
+          <li><a href="{% url 'community_page' community.name %}">{{ community.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </li>
+    </ul>
+  </div>
+    </div>
+</nav>

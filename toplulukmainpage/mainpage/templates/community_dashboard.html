@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ community.name }} Yönetim Paneli</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mb-4 text-center">{{ community.name }} Yönetim Paneli</h1>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+        </form>
+    </div>
+    
+    <section class="dashboard">
+
+       
+        <div class="mb-4 card shadow-sm">
+            <div class="card-body">
+                <h2 class="h4 text-center text-md-start">Hakkımızda & Vizyonumuz</h2>
+                <form method="post" action="{% url 'community_dashboard_by_id' community.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ community_info_form.about_us.id_for_label }}" class="form-label">Hakkımızda</label>
+                        {{ community_info_form.about_us }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ community_info_form.vision.id_for_label }}" class="form-label">Vizyonumuz</label>
+                        {{ community_info_form.vision }}
+                    </div>
+                    <button type="submit" name="submit_info" class="btn btn-primary w-100">Güncelle</button>
+                </form>
+            </div>
+        </div>
+
+    
+        <div class="mb-4 card shadow-sm">
+            <div class="card-body">
+                <h2 class="h4 text-center text-md-start">Etkinlikler</h2>
+                <form method="post" action="{% url 'community_dashboard_by_id' community.id %}" class="mb-3">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ event_form.name.id_for_label }}" class="form-label">Etkinlik Adı</label>
+                        {{ event_form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ event_form.details.id_for_label }}" class="form-label">Detaylar</label>
+                        {{ event_form.details }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ event_form.date.id_for_label }}" class="form-label">Tarih</label>
+                        {{ event_form.date }}
+                    </div>
+                    <button type="submit" name="submit_event" class="btn btn-success w-100">Etkinlik Ekle</button>
+                </form>
+
+               
+                <ul class="list-group">
+                    {% for event in community.events.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-column flex-md-row">
+                        <div class="text-center text-md-start w-100">
+                            <strong>{{ event.name }}</strong> - {{ event.date|date:"d M, Y H:i" }}<br>
+                            <small>{{ event.details }}</small>
+                        </div>
+                        <div class="mt-2 mt-md-0 d-flex w-100 justify-content-around">
+                            <a href="{% url 'community_event_edit' event.id %}" class="btn btn-sm btn-warning me-2 w-100">Düzenle</a>
+                            <a href="{% url 'community_event_delete' event.id %}" class="btn btn-sm btn-danger w-100" onclick="return confirm('Etkinliği silmek istediğinize emin misiniz?');">Sil</a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center w-100">Henüz etkinlik eklenmemiş.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+      
+        <div class="mb-4 card shadow-sm">
+            <div class="card-body">
+                <h2 class="h4 text-center text-md-start">Duyurular</h2>
+                <form method="post" action="{% url 'community_dashboard_by_id' community.id %}" class="mb-3">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ announcement_form.name.id_for_label }}" class="form-label">Duyuru Adı</label>
+                        {{ announcement_form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ announcement_form.details.id_for_label }}" class="form-label">Detaylar</label>
+                        {{ announcement_form.details }}
+                    </div>
+                    <button type="submit" name="submit_announcement" class="btn btn-success w-100">Duyuru Ekle</button>
+                </form>
+
+             
+                <ul class="list-group">
+                    {% for announcement in community.announcements.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-column flex-md-row">
+                        <div class="text-center text-md-start w-100">
+                            <strong>{{ announcement.name }}</strong><br>
+                            <small>{{ announcement.details }}</small>
+                        </div>
+                        <div class="mt-2 mt-md-0 d-flex w-100 justify-content-around">
+                            <a href="{% url 'community_announcement_edit' announcement.id %}" class="btn btn-sm btn-warning me-2 w-100">Düzenle</a>
+                            <a href="{% url 'community_announcement_delete' announcement.id %}" class="btn btn-sm btn-danger w-100" onclick="return confirm('Duyuruyu silmek istediğinize emin misiniz?');">Sil</a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center w-100">Henüz duyuru eklenmemiş.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+       
+        <div class="mb-4 card shadow-sm">
+            <div class="card-body">
+                <h2 class="h4 text-center text-md-start">Resimler</h2>
+                <form method="post" action="{% url 'community_dashboard_by_id' community.id %}" enctype="multipart/form-data" class="mb-3">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ image_form.image.id_for_label }}" class="form-label">Resim Yükle</label>
+                        {{ image_form.image }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ image_form.description.id_for_label }}" class="form-label">Açıklama</label>
+                        {{ image_form.description }}
+                    </div>
+                    <button type="submit" name="submit_image" class="btn btn-success w-100">Resim Ekle</button>
+                </form>
+        
+             
+                <ul class="list-group">
+                    {% for image in images %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-column flex-md-row">
+                        <div class="text-center text-md-start w-100">
+                            <img src="{{ image.image.url }}" alt="{{ image.description }}" class="img-thumbnail" width="100">
+                            <strong>{{ image.description }}</strong>
+                        </div>
+                        <div class="mt-2 mt-md-0 d-flex w-100 justify-content-around">
+                            <a href="{% url 'community_image_delete' image.id %}" class="btn btn-sm btn-danger w-100" onclick="return confirm('Resmi silmek istediğinize emin misiniz?');">Sil</a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center w-100">Henüz resim eklenmemiş.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+
+
+
+        <div class="mb-4 card shadow-sm">
+            <div class="card-body">
+                <h2 class="h4 text-center text-md-start">Etkinlik Kayıtları</h2>
+                {% for event, registrations in event_registrations.items %}
+                <div class="mb-3">
+                    <h3>{{ event.name }}</h3>
+                    <ul class="list-group">
+                        {% for registration in registrations %}
+                        <li class="list-group-item">
+                            <strong>{{ registration.name }} {{ registration.surname }}</strong> - {{ registration.student_number }} - {{ registration.email }}
+                            <br>
+                            Topluluğa Üye: {{ registration.is_member|yesno:"Evet,Hayır" }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">Bu etkinlik için henüz kayıt yapılmamış.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% empty %}
+                <p>Henüz kayıt yapılmamış etkinlik yok.</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+        
+
+    </section>
+</div>
+
+<div class="mb-5"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<footer>
+    <div class="footer-container">
+        <div class="footer-left">
+            <img src="{{ site_content.logo.url }}" alt="Logo" width="150px" style="margin-top: -50px;">
+            <p> <i class="fa-solid fa-phone" id="telefonlogo"></i>{{ site_content.contact_number }}</p>
+            <p id="p4"> <i class="fa-solid fa-location-dot" id="konumlogo"></i>Tarus Üniversitesi</p>
+            <p class="p1">{{ site_content.address }}</p>
+            
+            
+            <div class="social-media">
+                <a href="https://www.linkedin.com/in/yapay-zeka-ve-dijital-d%C3%B6n%C3%BC%C5%9F%C3%BCm-toplulu%C4%9Fu-16898a317/" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://x.com/TauYapayZeka" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+
+
+        </div>
+        <div class="footer-center">
+            <a href="{% url 'home' %}"><h3 id="div-anasayfa">Anasayfa</h3></a>
+            <ul>
+                <li><a href="#">Etkinliklerimiz</a></li>
+                <li><a href="#">Projelerimiz</a></li>
+                <li><a href="#">Hakkımızda</a></li>
+                <li><a href="#">Diğer Topluluklar</a></li>
+            </ul>
+        </div>
+        <div class="blog">
+            <h3 id="blog">Blog</h3>
+            <ul id="h3-li">
+                {% for blog in blogs %}
+                <li class="blog-li-elemanlar"><a href="{% url 'blog_detail' blog.slug %}">{{ blog.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="footer-right">
+            <form>
+                <h3 id="iletişim">Bizimle İletişime Geçin</h3>
+                <input type="text" placeholder="Adınız" required class="form">
+                <input type="text" placeholder="Soyadınız" required class="form">
+                <input type="email" placeholder="Email" required class="form">
+                <textarea placeholder="Mesajınız" required class="form"></textarea>
+                <button type="submit" id="buton">Gönder</button>
+            </form>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© Copyrights © 2024 & Tüm hakları saklıdır Yapay Zeka Ve Dijital Dönüşüm Topluluğu</p>
+    </div>
+</footer>

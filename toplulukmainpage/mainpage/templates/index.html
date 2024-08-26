@@ -1,0 +1,541 @@
+{% extends "layout.html" %} {% load static %} {% block content %}
+
+<div class="slider">
+  <div class="slides">
+    {% for image in slider_images %}
+    <div class="slide">
+      <img src="{{ image.image.url }}" alt="{{ image.caption }}" />
+    </div>
+    {% endfor %}
+  </div>
+  <div class="indicators">
+    {% for image in slider_images %}
+    <span class="dot" onclick="currentSlide({{ forloop.counter }})"></span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="slide-in">
+  <img src="{{ site_content.divider_image_1.url }}" id="bölme" />
+</div>
+
+<!-- <section class="etkinlikler-duyurular">
+  <div id="etkinliklerimiz">
+    <h2 id="kırp">ETKİNLİKLERİMİZ</h2>
+    <a href="#" id="yönlendirme">Tüm Etkinlikler →</a>
+
+    <ul class="duyurular">
+      <li class="etkinlik-li">
+        <div class="duyuru-basligi">
+          <h3 class="div-h3">Teknik Gezi</h3>
+          <time datetime="2024-06-10T09:41:00">Jun 10, 2024 09:41 AM</time>
+        </div>
+        <p class="div-h3">Etkinlik metnine ulaşmak için lütfen tıklayınız...</p>
+      </li>
+      <li class="etkinlik-li">
+        <div class="duyuru-basligi">
+          <h3 class="div-h3">Teknik Gezi</h3>
+          <time datetime="2024-06-10T09:41:00">Jun 10, 2024 09:41 AM</time>
+        </div>
+        <p class="div-h3">Etkinlik metnine ulaşmak için lütfen tıklayınız...</p>
+      </li>
+      <li class="etkinlik-li">
+        <div class="duyuru-basligi">
+          <h3 class="div-h3">Teknik Gezi</h3>
+          <time datetime="2024-06-10T09:41:00">Jun 10, 2024 09:41 AM</time>
+        </div>
+        <p class="div-h3">Etkinlik metnine ulaşmak için lütfen tıklayınız...</p>
+      </li>
+      <li class="etkinlik-li">
+        <div class="duyuru-basligi">
+          <h3 class="div-h3">Teknik Gezi</h3>
+          <time datetime="2024-06-10T09:41:00">Jun 10, 2024 09:41 AM</time>
+        </div>
+        <p class="div-h3">
+          Etkinlik metnine ulaşmak için lütfen tıklayınız....
+        </p>
+      </li>
+      <li class="etkinlik-li">
+        <div class="duyuru-basligi">
+          <h3 class="div-h3">Teknik Gezi</h3>
+          <time datetime="2024-06-10T09:41:00">Jun 10, 2024 09:41 AM</time>
+        </div>
+        <p class="div-h3">Etkinlik metnine ulaşmak için lütfen tıklayınız...</p>
+      </li>
+    </ul>
+  </div> -->
+<section class="etkinlikler-duyurular">
+  <div id="etkinliklerimiz" style="margin-top: 10px;">
+    <h2 style="margin-bottom: 50px; margin-top: 20px" id="kırp">ETKİNLİKLERİMİZ</h2>
+
+    <ul class="duyurular">
+        {% for event in events %}
+        <li class="etkinlik-li" style="height: 70px">
+            <div class="duyuru-basligi">
+                <h3 class="div-h3">{{ event.name }}</h3>
+                <time style="margin-bottom: -25px" datetime="{{ event.date|date:'c' }}">{{ event.date|date:"d M, Y H:i A" }}</time>
+            </div>
+            <p class="div-h3">
+                {{ event.details|truncatechars:30 }} <!-- Etkinlik metni 30 karakterle sınırlandırılıyor -->
+                {% if event.details|length > 30 %}
+                <a href="#" class="read-more-event" data-id="{{ event.id }}">Detaylar...</a>
+                {% endif %}
+            </p>
+        </li>
+        {% empty %}
+        <li class="etkinlik-li">Henüz etkinlik eklenmemiş.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="duyuru-basligi" style="margin-top: 10px; color: black">
+            <h3 style="color: black" class="div-h3" id="event-name"></h3>
+            <time id="event-date"></time>
+        </div>
+        <p style="color: black; margin-bottom: 15px; margin-top: 15px" class="div-h3" id="event-details"></p>
+
+        <form id="registrationForm" method="POST">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Ad" required />
+            <input type="text" name="surname" placeholder="Soyad" required />
+            <input type="email" name="email" placeholder="Mail Adresi" required />
+            <input type="text" name="contact_number" placeholder="İletişim Numarası" required />
+            <label style="display: flex">
+                Topluluğa üye misiniz?
+                <input style="width: 100px; margin-left: -35px; margin-top: 5px" type="checkbox" name="is_member" />
+            </label>
+            <button type="submit">Kayıt Ol</button>
+        </form>
+    </div>
+</div>
+
+<div id="duyurularsol">
+  <h2 id="div-h2">DUYURULAR <i class="fas fa-bell zil" id="zil"></i></h2>
+  <div id="li_elemanları">
+      {% for announcement in announcements %}
+      <li class="duyuruli">
+          <div class="duyuru-basligii">
+              <h3 class="h3">{{ announcement.name }}</h3>
+          </div>
+          <p class="p">
+              {{ announcement.details|truncatechars:30 }}
+              {% if announcement.details|length > 30 %}
+              <a href="#" class="read-more-announcement" data-id="{{ announcement.id }}">Detaylar...</a>
+              {% endif %}
+          </p>
+      </li>
+      {% empty %}
+      <li class="duyuruli">Henüz duyuru eklenmemiş.</li>
+      {% endfor %}
+  </div>
+</div>
+
+  <div id="announcementModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="duyuru-basligii">
+        <h3 id="announcement-name"></h3>
+      </div>
+      <p id="announcement-details"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  
+  document.querySelectorAll(".read-more-event").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      var eventId = this.getAttribute("data-id");
+
+      fetch("/event/" + eventId + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("event-name").innerText = data.name;
+          document.getElementById("event-details").innerText = data.details;
+          document.getElementById("event-date").innerText = new Date(
+            data.date
+          ).toLocaleString();
+
+          document.getElementById("eventModal").style.display = "block";
+        });
+    });
+  });
+
+ 
+  document.querySelectorAll(".close").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.getElementById("eventModal").style.display = "none";
+      document.getElementById("announcementModal").style.display = "none";
+    });
+  });
+
+ 
+  document
+    .getElementById("registrationForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      var formData = new FormData(this);
+      var eventId = document
+        .querySelector(".read-more-event")
+        .getAttribute("data-id");
+
+      fetch("/register/" + eventId + "/", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Kayıt başarılı");
+            document.getElementById("eventModal").style.display = "none";
+          }
+        });
+    });
+
+
+  document.querySelectorAll(".read-more-announcement").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      var announcementId = this.getAttribute("data-id");
+
+      fetch(`/announcement/${announcementId}/`)
+        .then((response) => response.json())
+        .then((data) => {
+        
+          if (data) {
+            document.getElementById("announcement-name").innerText = data.name;
+            document.getElementById("announcement-details").innerText =
+              data.details;
+
+            
+            document.getElementById("announcementModal").style.display =
+              "block";
+          } else {
+            console.error("Failed to fetch announcement details.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching announcement:", error);
+        });
+    });
+  });
+
+ 
+  document.querySelectorAll(".close").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.getElementById("eventModal").style.display = "none";
+      document.getElementById("announcementModal").style.display = "none";
+    });
+  });
+</script>
+
+<style>
+  #announcement-details {
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+  #event-details {
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+    transform: translateY(0);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #registrationForm input,
+  #registrationForm button,
+  #registrationForm label {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  #registrationForm input[type="text"],
+  #registrationForm input[type="email"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  #registrationForm button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  #registrationForm button:hover {
+    background-color: #45a049;
+  }
+
+  @media (max-width: 600px) {
+    .modal-content {
+      width: 90%;
+      padding: 10px;
+      padding-right: 40px;
+      font-size: 14px;
+    }
+
+    .close {
+      font-size: 24px;
+    }
+
+    #registrationForm button {
+      padding: 10px;
+      font-size: 16px;
+    }
+  }
+</style>
+
+<div>
+  <img src="{{ site_content.divider_image_2.url }}" id="slice" />
+</div>
+
+<!-- slice kartlık -->
+<!-- <div id="hamza">
+  <div class="wrapper">
+    <i id="left" style="z-index: 1000;" class="fa-solid fa-angle-left"></i>
+    <ul class="carousel">
+      {% for project in projects %}
+      <li class="card" data-id="{{ project.id }}">
+        <div class="img">
+          {% if project.image %}
+          <img src="{{ project.image.url }}" alt="{{ project.name }}" draggable="false" />
+          {% else %}
+          <img src="{% static 'images/default_project.jpg' %}" alt="img" draggable="false" />
+          {% endif %}
+        </div>
+        <h2 class="slider-h2">{{ project.name }}</h2>
+        <span>Proje detayı için tıklayınız.</span>
+      </li>
+      {% endfor %}
+    </ul>
+    <i id="right" class="fa-solid fa-angle-right"></i>
+  </div>
+</div> -->
+<div id="hamza" style="margin-left: -50px">
+  <div class="wrapper" style="width: 100%">
+    <i
+      id="left"
+      style="margin-left: -3px; z-index: 1000"
+      class="fa-solid fa-angle-left"
+    ></i>
+    <ul class="carousel">
+      {% for project in projects %}
+      <li style="width: 100%" class="card" data-id="{{ project.id }}">
+        <div class="img">
+          {% if project.image %}
+          <img
+            src="{{ project.image.url }}"
+            alt="{{ project.name }}"
+            draggable="false"
+          />
+          {% else %}
+          <img
+            src="{% static 'images/default_project.jpg' %}"
+            alt="img"
+            draggable="false"
+          />
+          {% endif %}
+        </div>
+        <h2 class="slider-h2">{{ project.name }}</h2>
+        <span>Proje detayı için tıklayınız.</span>
+      </li>
+      {% endfor %}
+    </ul>
+    <i
+      id="right"
+      style="margin-right: -3px"
+      class="fa-solid fa-angle-right"
+    ></i>
+  </div>
+</div>
+
+<div id="projectDetailModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div class="modal-img">
+      <img id="modal-image" src="" alt="Project Image" draggable="false" />
+    </div>
+    <h2 id="modal-title"></h2>
+    <div id="modal-description"></div>
+  </div>
+</div>
+<style>
+  #modal-description {
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .close {
+    color: #aaa;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .modal img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    z-index: 1000;
+  }
+
+  #modal-description {
+    text-align: left;
+  }
+
+  @media (max-width: 600px) {
+    .modal-content {
+      padding: 15px;
+      font-size: 14px;
+    }
+
+    .close {
+      font-size: 24px;
+    }
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Script is running");
+
+    document.querySelectorAll(".card").forEach(function (card) {
+      card.addEventListener("click", function () {
+        var projectId = this.getAttribute("data-id");
+        console.log("Project card clicked, ID:", projectId);
+
+        fetch(`/project/${projectId}/`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("modal-title").innerText = data.name;
+            document.getElementById("modal-description").innerHTML =
+              data.description;
+            document.getElementById("modal-image").src =
+              data.image_url || '{% static "images/default_project.jpg" %}';
+            document.getElementById("projectDetailModal").style.display =
+              "block";
+            console.log("Modal opened with project details");
+          })
+          .catch((error) =>
+            console.error("Error fetching project details:", error)
+          );
+      });
+    });
+
+    const closeButton = document.querySelector("#projectDetailModal .close");
+    console.log(closeButton);
+
+    if (closeButton) {
+      closeButton.addEventListener("click", function () {
+        console.log("Close button clicked");
+        document.getElementById("projectDetailModal").style.display = "none";
+      });
+    } else {
+      console.error("Close button not found");
+    }
+  });
+</script>
+
+<!-- slice kartlık -->
+
+<div class="container">
+  <div class="hakkimizda">
+    <h2 class="hakkımızda">HAKKIMIZDA</h2>
+    <p class="div-h2-p">{{ site_content.about_us }}</p>
+  </div>
+
+  <div class="vizyonumuz">
+    <h2 class="hakkımızda">VİZYONUMUZ</h2>
+    <p class="div-h2-p">{{ site_content.vision }}</p>
+  </div>
+</div>
+
+<div id="grislice"></div>
+
+{% endblock %}
