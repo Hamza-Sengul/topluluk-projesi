@@ -75,13 +75,19 @@ def certificate_page(request, announcement_id):
         # Sertifikayı bulma
         certificate = Certificate.objects.filter(announcement_id=announcement_id, email=email).first()
         if certificate:
+            certificate_path = certificate.certificate_image.path
+            
+            # Dosyanın varlığını kontrol et
+            if not os.path.exists(certificate_path):
+                raise Http404("Sertifika dosyası bulunamadı.")
+
             try:
                 # Dosyayı binary modda açarak indirilebilir hale getiriyoruz
-                response = FileResponse(open(certificate.certificate_image.path, 'rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.png")
+                response = FileResponse(open(certificate_path, 'rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.png")
                 return response
             except Exception as e:
-                print("Error:", e)
-                raise Http404("Sertifika bulunamadı veya açılamadı.")
+                print("Dosya açılırken bir hata oluştu:", e)
+                raise Http404("Sertifika açılamadı.")
         else:
             return HttpResponse("E-posta kayıtlarımızla eşleşmiyor.", status=404)
 
