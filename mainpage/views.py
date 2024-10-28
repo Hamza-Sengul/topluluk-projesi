@@ -75,9 +75,9 @@ def certificate_page(request, announcement_id):
         # Sertifikayı bulma
         certificate = Certificate.objects.filter(announcement_id=announcement_id, email=email).first()
         if certificate:
-            # Dosyayı `rb` modunda açarak okunabilir hale getirme
             try:
-                response = FileResponse(certificate.certificate_image.open('rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.jpg")
+                # Dosyayı binary modda açarak indirilebilir hale getiriyoruz
+                response = FileResponse(open(certificate.certificate_image.path, 'rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.png")
                 return response
             except Exception as e:
                 print("Error:", e)
