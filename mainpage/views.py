@@ -77,10 +77,10 @@ def certificate_page(request, announcement_id):
         if certificate:
             certificate_path = certificate.certificate_image.path
             
-            # Sunucuda dosya yolunu kontrol edin
+            # Dosya yolunu kontrol et
             if not os.path.exists(certificate_path):
                 print("Dosya bulunamadı:", certificate_path)
-                raise Http404("Sertifika dosyası sunucuda bulunamadı.")
+                raise Http404("Sertifika dosyası bulunamadı.")
 
             try:
                 response = FileResponse(open(certificate_path, 'rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.png")
@@ -92,7 +92,6 @@ def certificate_page(request, announcement_id):
             return HttpResponse("E-posta kayıtlarımızla eşleşmiyor.", status=404)
 
     return render(request, "certificate.html", {"announcement_id": announcement_id})
-
 
 
 from django.http import HttpResponse, FileResponse
