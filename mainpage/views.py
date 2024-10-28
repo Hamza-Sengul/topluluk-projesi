@@ -83,6 +83,7 @@ def certificate_page(request, announcement_id):
                 raise Http404("Sertifika dosyası bulunamadı.")
 
             try:
+                # Dosyayı binary modda açarak indirilebilir hale getiriyoruz
                 response = FileResponse(open(certificate_path, 'rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.png")
                 return response
             except Exception as e:
