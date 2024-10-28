@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <h4 class="form-title">Sertifika Al</h4>
+        <form id="certificateForm" method="POST" action="{% url 'certificate_page' announcement_id=announcement_id %}">
+            {% csrf_token %}
+            <input type="hidden" name="announcement_id" id="announcement_id" value="{{ announcement_id }}">
+            
+            <div class="form-group">
+                <label for="email">Üniversite E-posta Adresiniz:
+                    <br> <br>
+                    Örnek: 222******@tarsus.edu.tr
+                </label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="E-posta adresinizi giriniz" required>
+            </div>
+            
+            <button type="submit" class="form-button">Sertifika Al</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Formu ortalamak ve tam ekran uyumluluğunu sağlamak için genel ayarlar */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    padding: 20px;
+    background-color: #f4f4f9;
+}
+
+/* Kart stili */
+.form-card {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Başlık stili */
+.form-title {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Form grubu */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+/* Label stili */
+.form-group label {
+    display: block;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* Giriş alanı stili */
+.form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Buton stili */
+.form-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-button:hover {
+    background-color: #0056b3;
+}
+
+/* Mobil uyumluluk */
+@media (max-width: 480px) {
+    .form-card {
+        padding: 15px;
+    }
+
+    .form-title {
+        font-size: 1.3em;
+    }
+
+    .form-input, .form-button {
+        font-size: 0.9em;
+    }
+}
+
+</style>
+{% endblock %}

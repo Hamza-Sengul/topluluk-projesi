@@ -1,0 +1,31 @@
+
+<div id="eventModal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ event.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ event.details }}</p>
+                <form method="post" action="{% url 'event_detail_and_register' event.id %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Etkinliğe Katıl</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEventModal(eventId) {
+    const url = "{% url 'event_detail_and_register' 0 %}".replace('0', eventId);
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('eventModal').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('eventModal')).show();
+        });
+}
+</script>

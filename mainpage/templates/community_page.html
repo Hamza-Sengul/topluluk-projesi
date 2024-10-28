@@ -1,0 +1,456 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+
+<!-- <img src="{% static 'img/4.jpg' %}" width="100%" alt="" class="imagehead"> -->
+
+<section class="section-hero">
+    <div class="title-wrapper">
+        <h1>{{community.name}}</h1>
+        <h3><i>Topluluğu</i></h3>
+    </div>
+</section>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nerko+One&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+.section-hero h1 {
+    font-family: "Nerko One", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+.section-hero h3 {
+    font-family: "Nerko One", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+.section-hero{
+    width: 100%;
+    height: 90vh;
+    background-image: url({% static 'img/bg.png' %});
+    background-position: center;
+    background-color: #f3f3f3;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.section-hero .title-wrapper{
+    margin-bottom: 400px;
+}
+.section-hero .title-wrapper h1{
+    font-size: 60px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+.section-hero .title-wrapper h3{
+    font-size: 30px;
+    text-align: end;
+    margin-right: 30px;
+}
+@media screen and (max-width: 700px){
+    .section-hero .title-wrapper h1{
+        font-size: 40px;
+    }
+}
+@media screen and (max-width: 430px){
+    .section-hero .title-wrapper h1{
+        font-size: 30px;
+    }
+    .section-hero .title-wrapper h3{
+        font-size: 25px;
+        margin-right: 0px;
+    }
+}
+</style>
+<div class="gallery-container" style="margin-bottom: 30px;">
+    <div class="gallery-title">
+        <h1 style="text-align: center; margin-bottom: 30px; margin-top: 20px;">Fotoğraf Galerisi</h1>
+    </div>
+    <div class="image-slider">
+        {% for image in images %}
+        <img src="{{ image.image.url }}" alt="{{ image.description }}">
+        {% empty %}
+        <p>Henüz bu topluluk için bir resim eklenmemiş.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+<script>
+    window.addEventListener('load', () => {
+        const slider = document.querySelector('.image-slider');
+        const sliderImages = Array.from(slider.children);
+        const imgWidth = 300; 
+        const sliderWidth = sliderImages.length * imgWidth;
+
+      
+        while (slider.children.length < sliderImages.length * 3) {
+            for (let i = 0; i < sliderImages.length; i++) {
+                const clone = sliderImages[i].cloneNode(true);
+                slider.appendChild(clone);
+            }
+        }
+
+       
+        slider.style.width = `${sliderWidth * 3}px`;
+    });
+</script>
+<style>
+    .gallery-container {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .image-slider {
+        display: flex;
+        animation: slide-animation 100s linear infinite;
+    }
+
+    .image-slider img {
+        width: 300px; 
+        flex-shrink: 0;
+    }
+
+    @keyframes slide-animation {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+</style>
+
+<div class="container" style="margin-bottom: 30px;">
+    <div class="hakkimizda">
+        <h2 class="hakkımızda">HAKKIMIZDA</h2>
+        <p class="div-h2-p">
+            {{ about_us|safe }}
+        </p>
+    </div>
+
+    <div class="vizyonumuz">
+        <h2 class="hakkımızda">VİZYONUMUZ</h2>
+        <p class="div-h2-p">
+            {{ vision|safe }}
+        </p>
+    </div>
+</div>
+
+
+
+
+<section class="etkinlikler-duyurular">
+    <div id="etkinliklerimiz">
+        <h2 style="margin-bottom: 10px;">ETKİNLİKLERİMİZ</h2>
+        <ul class="duyurular">
+            {% for event in community.events.all %}
+            <li class="etkinlik-li" style="height: 80px; border-radius: 10px;" onclick="openEventModal({{ event.id }})">
+                <div class="duyuru-basligi">
+                    <h3 class="div-h3">{{ event.name }}</h3>
+                    <time datetime="{{ event.date|date:'c' }}">{{ event.date|date:"d M, Y H:i A" }}</time>
+                </div>
+                <p class="div-h3">{{ event.details|truncatechars:30 }}</p>
+            </li>
+            {% empty %}
+                <li class="etkinlik-li">Henüz etkinlik eklenmemiş.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="eventModalLabel">Etkinlik Detayları</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p id="eventDetails"></p>
+              <form id="eventRegistrationForm" method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="event_id" id="event_id" value="">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Ad</label>
+                  <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                  <label for="surname" class="form-label">Soyad</label>
+                  <input type="text" class="form-control" id="surname" name="surname" required>
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                  <label for="student_number" class="form-label">Öğrenci Numarası</label>
+                  <input type="text" class="form-control" id="student_number" name="student_number" required>
+                </div>
+                <div class="mb-3">
+                  <label for="contact_number" class="form-label">İletişim Numarası</label>
+                  <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+                </div>
+                <div class="form-check mb-3">
+                  <input type="checkbox" class="form-check-input" id="is_member" name="is_member">
+                  <label class="form-check-label" for="is_member">Topluluk Üyesi misiniz?</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>
+        #eventDetails {
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+      </style>
+
+      <script>
+        function openEventModal(eventId) {
+   
+    fetch(`/community/event/${eventId}/`)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('eventModalLabel').innerText = data.name;
+        document.getElementById('eventDetails').innerText = data.details;
+        document.getElementById('event_id').value = eventId;
+        
+        new bootstrap.Modal(document.getElementById('eventModal')).show();
+    });
+}
+
+document.getElementById('eventRegistrationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch(`/community/register/${formData.get('event_id')}/`, {
+        method: 'POST',
+        body: formData,
+    }).then(response => response.json()).then(data => {
+        if (data.success) {
+            alert('Etkinliğe başarıyla kaydoldunuz.');
+            location.reload();
+        } else {
+            alert('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+    });
+});
+
+        </script>
+
+<div id="duyurularsol">
+    <h2>DUYURULAR</h2>
+    <div id="li_elemanları">
+        <ul>
+            {% for announcement in community.announcements.all %}
+            <li class="duyuruli">
+                <div class="duyuru-basligii">
+                    <h3 class="h3">{{ announcement.name }}</h3>
+                </div>
+                <p class="p">{{ announcement.details|truncatechars:20 }}
+                    <a href="#" style="color: black;" class="detaylar-link" data-title="{{ announcement.name }}" data-details="{{ announcement.details }}">Detaylar</a>
+                </p>
+            </li>
+            {% empty %}
+            <li class="duyuruli">Henüz duyuru eklenmemiş.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Popup -->
+<div id="duyuru-popup" style="display:none;">
+    <div class="popup-content">
+        <span class="close">&times;</span>
+        <h3 id="popup-title"></h3>
+        <p id="popup-details"></p>
+    </div>
+</div>
+</section>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const detaylarLinks = document.querySelectorAll(".detaylar-link");
+    const popup = document.getElementById("duyuru-popup");
+    const popupTitle = document.getElementById("popup-title");
+    const popupDetails = document.getElementById("popup-details");
+    const closeBtn = document.querySelector(".close");
+
+    detaylarLinks.forEach(link => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            const title = this.getAttribute("data-title");
+            const details = this.getAttribute("data-details");
+
+            popupTitle.textContent = title;
+            popupDetails.textContent = details;
+
+            popup.style.display = "block";
+        });
+    });
+
+    closeBtn.addEventListener("click", function() {
+        popup.style.display = "none";
+    });
+
+    window.addEventListener("click", function(event) {
+        if (event.target == popup) {
+            popup.style.display = "none";
+        }
+    });
+});
+
+</script>
+
+<style>
+    #popup-details {
+        word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+    }
+    #duyuru-popup {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+    .etkinlikler-duyurular {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-top: 100px;
+        padding-left: 75px;
+    }
+    .etkinlikler-duyurular h2 {
+        display: inline-block;
+        border-bottom: 4px solid #37B7C3;
+    }
+    ul { 
+        list-style-type: none;
+    }
+    .etkinlik-li {
+        color: white;
+        width: 80%;
+        background-color: #37B7C3;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .duyuru-basligi {
+        margin-left: 0px;
+        margin-top: 10px;
+    }
+    .duyuru-basligi time {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+    .div-h3 {
+        margin-top: 10px;
+        margin-left: 15px;
+    }
+#li_elemanları {
+    width: 100%;
+}
+.duyurularsol {
+    width: 100%;
+}
+    .duyuruli {
+        background-color: white;
+        width: 80%;
+        border-radius: 24px;
+        margin-top: 10px;
+        margin-left: -30px;
+        padding: 2px;
+        padding-left: 3px;
+    }
+    
+
+    @media only screen and (max-width: 768px) {
+        .etkinlikler-duyurular h2 {
+        display: inline-block;
+        margin-left: 30px;
+        border-bottom: 4px solid #37B7C3;
+    }
+        .etkinlikler-duyurular {
+        display: grid;
+        grid-template-columns: 1fr;
+        margin-top: 100px;
+        justify-items: left;
+        padding-left: 0px;
+        padding-right: 10px;
+        }
+        .duyurular {
+            width: 100%;
+        }
+        #etkinliklerimiz {
+            width: 100%;
+            margin-left: -15px;
+        }
+        .etkinlik-li {
+        color: white;
+        width: 100%;
+        background-color: #37B7C3;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .duyuru-basligi {
+        margin-left: 0px;
+        margin-top: 0px;
+    }
+    .duyuru-basligi time {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+    .div-h3 {
+        margin-top: 10px;
+        margin-left: 15px;
+    }
+    #duyurularsol {
+        margin-left: -10px;
+    }
+    .duyuruli {
+        background-color: white;
+        width: 350px;
+        border-radius: 24px;
+        margin-top: 10px;
+        margin-left: 0px;
+        padding: 2px;
+        padding-left: 3px;
+    }
+    }
+</style>
+{% endblock %}

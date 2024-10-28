@@ -1,0 +1,151 @@
+#hamza {
+  display: flex;
+  padding: 0 35px;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f7f8;
+  height: 500px;
+}
+.wrapper {
+  max-width: 1100px;
+  width: 100%;
+  position: relative;
+  margin-top: 5px;
+}
+.wrapper i {
+  top: 50%;
+  height: 50px;
+  width: 50px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  position: absolute;
+  text-align: center;
+  line-height: 50px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.23);
+  transform: translateY(-50%);
+  transition: transform 0.1s linear;
+}
+.wrapper i:active {
+  transform: translateY(-50%) scale(0.85);
+}
+.wrapper i:first-child {
+  left: -22px;
+}
+.wrapper i:last-child {
+  right: -22px;
+}
+.wrapper .carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% / 3) - 12px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 16px;
+  border-radius: 8px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+.carousel .no-transition {
+  scroll-behavior: auto;
+}
+.carousel .dragging {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+.carousel .dragging .card {
+  cursor: grab;
+  user-select: none;
+}
+.carousel :where(.card, .img) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.carousel .card {
+  scroll-snap-align: start;
+  height: 400px;
+  list-style: none;
+  background: #fff;
+  cursor: pointer;
+  padding-bottom: 15px;
+  flex-direction: column;
+}
+.carousel .card .img {
+  height: 190px;
+  width: 190px;
+}
+.card .img img {
+  width: 190px;
+  height: 190px;
+  object-fit: cover;
+  border: 4px solid #fff;
+  margin-top: 15px;
+}
+.carousel .card h2 {
+  font-weight: 500;
+  font-size: 1.56rem;
+  margin: 30px 0 5px;
+}
+.carousel .card span {
+  color: #6a6d78;
+  font-size: 1.31rem;
+}
+
+.card {
+  width: 300px;
+}
+
+#right {
+  margin-right: 55px;
+}
+/*kart slider*/
+
+@media only screen and (max-width: 768px) {
+  body,
+  html {
+    overflow-x: hidden;
+  }
+
+  /*proje kartlıklar*/
+
+  .wrapper .carousel {
+    grid-auto-columns: 120%;
+  }
+  .card {
+    width: 70%;
+    height: auto;
+  }
+  .wrapper {
+    margin-left: 50px;
+  }
+  .slider-h2 {
+    font-size: 16px !important;
+  }
+  .card span {
+    font-size: 14px !important;
+    white-space: nowrap !important;
+  }
+
+  #left,
+  #right {
+    font-size: 18px;
+    top: 50%;
+  }
+
+  #left {
+    left: -20px;
+  }
+
+  #right {
+    right: -20px;
+  }
+  .wrapper {
+    position: relative;
+    overflow: visible;
+  }
+}

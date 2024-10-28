@@ -1,0 +1,753 @@
+{% extends "layout.html" %} {% load static %} {% block content %}
+
+
+
+<div id="overlay" style="display: none; position: fixed; left: 0; top: 0; width: 100%; height: 200%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+
+<div id="survey-popup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); z-index: 1001; max-width: 90%; width: 400px;">
+  <h2>Website Anketimiz</h2>
+  <iframe src="https://forms.gle/52WBr19XP9gbxjN5A" style="width:100%; height: 500px;"></iframe>
+  <button onclick="closePopup()" style="margin-top: 10px; padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">Kapat</button>
+</div>
+
+<div id="toggle-popup" style="z-index: 1000; position: fixed; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0); padding: 10px; cursor: pointer;">
+  <i style="font-size: 20px;" class="fa-solid fa-angles-right"></i>
+</div>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+   
+    if (!localStorage.getItem('popupShown')) {
+        showPopup();
+        localStorage.setItem('popupShown', 'true');
+    }
+    
+    
+    document.getElementById("toggle-popup").addEventListener("click", function() {
+        showPopup();
+    });
+});
+
+function showPopup() {
+    document.getElementById("survey-popup").style.display = 'block';
+    document.getElementById("overlay").style.display = 'block';
+}
+
+function closePopup() {
+    document.getElementById("survey-popup").style.display = 'none';
+    document.getElementById("overlay").style.display = 'none';
+}
+
+</script>
+<style>
+  @media (max-width: 768px) {
+    #survey-popup {
+        width: 90%;
+        height: auto;
+    }
+
+    #survey-popup iframe {
+        height: 200px;
+    }
+
+    #toggle-popup {
+        left: 10px;
+        top: 90%;
+        transform: translateY(-50%);
+        padding: 5px;
+    }
+}
+
+</style>
+
+<div class="slider">
+  <div class="slides">
+    {% for image in slider_images %}
+    <div class="slide {% if forloop.first %}active{% endif %}">
+      <img src="{{ image.image.url }}" alt="{{ image.caption }}" />
+    </div>
+    {% endfor %}
+  </div>
+  <div class="dots">
+    {% for image in slider_images %}
+    <span class="dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></span>
+    {% endfor %}
+  </div>
+</div>
+
+
+<div class="arcont">
+  <img src="{{ site_content.divider_image_1.url }}" alt="" width="100%" />
+</div>
+
+<section>
+  <div class="eventcont">
+    <div class="event">
+      <h2>ETKİNLİKLERİMİZ</h2>
+      {% for event in events %}
+      <div class="event2">
+        <div class="event-item">
+          <div class="eventbaslik">
+            <h4>{{ event.name }}</h4>
+          </div>
+          <div class="eventdetay" style="margin-top: 10px;">
+            <p>{{ event.details|truncatechars:30 }}
+              
+              <a href="#" class="read-more-event" data-id="{{ event.id }}" style="color: white;">Detaylar</a>
+             
+            </p>
+          </div>
+          <div class="etkinliktarih">
+            <div class="tarih">{{ event.date|date:"d.m.Y" }}</div>
+            <div class="saat">{{ event.date|date:"H:i" }}</div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p>Henüz etkinlik eklenmemiş.</p>
+      {% endfor %}
+    </div>
+    <div class="anc">
+      <h2 style="margin-top: -10px;">DUYURULAR</h2>
+      {% for announcement in announcements %}
+      <div class="anc2" style="height: 90px;">
+        <div class="anc-item">
+          <div class="ancbaslik">
+            <h4>{{ announcement.name }}</h4>
+          </div>
+          <div class="ancdetay">
+            <p>{{ announcement.details|truncatechars:45 }}
+              
+              <a href="#" class="read-more-announcement" data-id="{{ announcement.id }}" style="color: black;">Detaylar</a>
+              
+            </p>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p>Henüz duyuru eklenmemiş.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Modal for Event Details -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel">Etkinlik Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h3 id="event-name"></h3>
+        <time id="event-date"></time>
+        <p id="event-details"></p>
+        <form id="registrationForm" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="event_id" id="event_id" value="{{ event.id }}">
+          <div class="mb-3">
+              <label for="name" class="form-label">Ad</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="mb-3">
+              <label for="surname" class="form-label">Soyad</label>
+              <input type="text" class="form-control" id="surname" name="surname" required>
+          </div>
+          <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="mb-3">
+              <label for="contact_number" class="form-label">İletişim Numarası</label>
+              <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+          </div>
+          <div class="mb-3">
+              <label for="student_number" class="form-label">Öğrenci Numarası</label>
+              <input type="text" class="form-control" id="student_number" name="student_number" required>
+          </div>
+          <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="is_member" name="is_member">
+              <label class="form-check-label" for="is_member">Topluluk Üyesi misiniz?</label>
+          </div>
+          <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Announcement Details -->
+<div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="announcementModalLabel">Duyuru Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h3 id="announcement-name"></h3>
+        <p id="announcement-details"></p>
+        <button id="get-certificate-btn" style="display: none;">Sertifika Al</button>
+    </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll(".read-more-announcement").forEach(function(link) {
+    link.addEventListener("click", function(e) {
+      e.preventDefault();
+      var announcementId = this.getAttribute("data-id");
+
+      fetch("/announcement/" + announcementId + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("announcement-name").innerText = data.name;
+          document.getElementById("announcement-details").innerText = data.details;
+
+          if (data.certificate_available) {
+            document.getElementById("get-certificate-btn").style.display = "block";
+          } else {
+            document.getElementById("get-certificate-btn").style.display = "none";
+          }
+
+          var announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+          announcementModal.show();
+        })
+        .catch((error) => {
+          console.error("Error fetching announcement:", error);
+        });
+    });
+  });
+
+  document.getElementById("get-certificate-btn").addEventListener("click", function() {
+   var announcementId = document.querySelector(".read-more-announcement").getAttribute("data-id");
+   window.location.href = "/certificate/" + announcementId + "/";
+});
+</script>
+
+<script>
+  // Event details modal
+  document.querySelectorAll(".read-more-event").forEach(function(link) {
+    link.addEventListener("click", function(e) {
+        e.preventDefault();
+        var eventId = this.getAttribute("data-id");
+
+        fetch("/event/" + eventId + "/")
+            .then((response) => response.json())
+            .then((data) => {
+                document.getElementById("event-name").innerText = data.name;
+                document.getElementById("event-details").innerText = data.details;
+                document.getElementById("event-date").innerText = new Date(data.date).toLocaleString();
+
+                // Burada event_id input alanını dinamik olarak set ediyoruz
+                document.getElementById("event_id").value = eventId;
+
+                var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                eventModal.show();
+            })
+            .catch((error) => {
+                console.error("Error fetching event:", error);
+            });
+    });
+});
+
+
+  // Announcement details modal
+  document.querySelectorAll(".read-more-announcement").forEach(function(link) {
+    link.addEventListener("click", function(e) {
+      e.preventDefault();
+      var announcementId = this.getAttribute("data-id");
+
+      fetch("/announcement/" + announcementId + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("announcement-name").innerText = data.name;
+          document.getElementById("announcement-details").innerText = data.details;
+
+          var announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+          announcementModal.show();
+        })
+        .catch((error) => {
+          console.error("Error fetching announcement:", error);
+        });
+    });
+  });
+
+  // Close modals
+  document.querySelectorAll(".btn-close").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var eventModal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+      if (eventModal) eventModal.hide();
+
+      var announcementModal = bootstrap.Modal.getInstance(document.getElementById('announcementModal'));
+      if (announcementModal) announcementModal.hide();
+    });
+  });
+
+  // Registration form submission
+  document.getElementById("registrationForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    var eventIdElement = document.getElementById("event_id");
+    if (eventIdElement && eventIdElement.value) {
+        var eventId = eventIdElement.value;
+
+        var formData = new FormData(this);
+
+        fetch("/register/" + eventId + "/", {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.success) {
+                alert("Kayıt başarılı");
+                var eventModal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+                if (eventModal) {
+                    eventModal.hide();
+                }
+            } else {
+                console.error("Error during registration:", data.error);
+            }
+        })
+        .catch((error) => {
+            console.error("Error during registration:", error);
+        });
+    } else {
+        console.error("event_id element not found or is empty.");
+    }
+});
+
+
+
+</script>
+
+
+<style>
+   /* Modal z-index problemini çözmek için */
+   .modal {
+    z-index: 1050;
+  }
+
+  .modal-backdrop {
+    z-index: 1040;
+  }
+
+  /* Form elemanlarının erişilebilirliğini artırmak için */
+  .modal-content {
+    position: relative;
+    z-index: 1051;
+  }
+  #announcement-details {
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+  #event-details {
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+
+  /* .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+    transform: translateY(0);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #registrationForm input,
+  #registrationForm button,
+  #registrationForm label {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  #registrationForm input[type="text"],
+  #registrationForm input[type="email"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  #registrationForm button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  #registrationForm button:hover {
+    background-color: #45a049;
+  }
+
+  @media (max-width: 600px) {
+    .modal-content {
+      width: 90%;
+      padding: 10px;
+      padding-right: 40px;
+      font-size: 14px;
+    }
+
+    .close {
+      font-size: 24px;
+    }
+
+    #registrationForm button {
+      padding: 10px;
+      font-size: 16px;
+    }
+  } */
+</style>
+<div id="hamza" style="position: relative;">
+  <h2 style="position: absolute;top: 0;text-align: center;display: inline-block;border-bottom: 4px solid #37B7C3; margin-top: 15px; margin-bottom: 10px;">PROJELERİMİZ</h2>
+  <div class="wrapper" style="margin-top: 40px;">
+    <i style="z-index: 999;" id="left" class="fa-solid fa-angle-left"></i>
+    <ul class="carousel">
+      {% for project in projects %}
+      <li class="card" data-id="{{ project.id }}">
+        <div class="img"><img src="{{ project.image.url }}" alt="{{ project.name }}" draggable="false"></div>
+        <h2 class="slider-h2">{{ project.name }}</h2>
+        <span>Proje detayı için tıklayınız.</span>
+      </li>
+      {% endfor %}
+    </ul>
+    <i id="right" class="fa-solid fa-angle-right"></i>
+  </div>
+</div>
+
+<div id="projectDetailModal" class="modal2">
+  <div class="modal-content2">
+    <span class="close">&times;</span>
+    <div class="modal-img">
+      <img id="modal-image" src="" alt="Project Image" draggable="false" />
+    </div>
+    <h2 id="modal-title"></h2>
+    <div id="modal-description2"></div>
+  </div>
+</div>
+
+
+<style>
+  .wrapper {
+    position: relative;
+    width: 100%;
+    /* overflow: hidden; */
+  }
+
+  .carousel {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .card {
+    min-width: 200px;
+    margin-right: 15px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .img {
+    margin-bottom: 10px;
+  }
+
+  .img img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .slider-h2 {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+
+  /* #left,
+  #right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 24px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    z-index: 1000;
+  }
+
+  #left {
+    left: 10px;
+  }
+
+  #right {
+    right: 10px;
+  } */
+
+  .modal2 {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .modal-content2 {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .close {
+    color: #aaa;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .modal2 img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    z-index: 1000;
+  }
+
+  #modal-description2 {
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .modal-content2 {
+      padding: 15px;
+      font-size: 14px;
+    }
+
+    .close {
+      font-size: 24px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".card").forEach(function (card) {
+      card.addEventListener("click", function () {
+        var projectId = this.getAttribute("data-id");
+
+        fetch(`/project/${projectId}/`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("modal-title").innerText = data.name;
+            document.getElementById("modal-description2").innerHTML =
+              data.description;
+            document.getElementById("modal-image").src =
+              data.image_url || '{% static "images/default_project.jpg" %}';
+            document.getElementById("projectDetailModal").style.display =
+              "block";
+          })
+          .catch((error) =>
+            console.error("Error fetching project details:", error)
+          );
+      });
+    });
+
+    const closeButton = document.querySelector("#projectDetailModal .close");
+
+    if (closeButton) {
+      closeButton.addEventListener("click", function () {
+        document.getElementById("projectDetailModal").style.display = "none";
+      });
+    }
+  });
+</script>
+
+
+<!-- slice kartlık -->
+
+<div class="container2">
+  <div class="hakkimizda2">
+    <h2 class="hakkımızda2">HAKKIMIZDA</h2>
+    <p class="div-h2-p2">{{ site_content.about_us }}</p>
+  </div>
+
+  <div class="vizyonumuz2">
+    <h2 class="hakkımızda2">VİZYONUMUZ</h2>
+    <p class="div-h2-p2">{{ site_content.vision }}</p>
+  </div>
+</div>
+
+<style>
+  .container2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hakkimizda2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 50px 0 50px;
+  }
+  .hakkimizda2 p {
+    text-align: justify;
+  }
+  .hakkimizda2 h2 {
+    border-bottom: 4px solid #37B7C3;
+    display: inline-block;
+  }
+  .vizyonumuz2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 50px 0 50px;
+  }
+  .vizyonumuz2 p {
+    text-align: justify;
+  }
+  .vizyonumuz2 h2 {
+    border-bottom: 4px solid #37B7C3;
+    display: inline-block;
+  }
+  @media (max-width: 600px) {
+    .container2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const aboutSection = document.querySelector('.hakkimizda2');
+    const visionSection = document.querySelector('.vizyonumuz2');
+
+    function checkPosition() {
+        const aboutPosition = aboutSection.getBoundingClientRect().top;
+        const visionPosition = visionSection.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.3;
+
+        if (aboutPosition < screenPosition) {
+            aboutSection.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+            aboutSection.style.transform = 'translateX(0)';
+            aboutSection.style.opacity = '1';
+        }
+
+        if (visionPosition < screenPosition) {
+            visionSection.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+            visionSection.style.transform = 'translateX(0)';
+            visionSection.style.opacity = '1';
+        }
+    }
+
+    function debounce(func, wait = 10, immediate = true) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            const later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            const callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    }
+
+    // Initial transform setup
+    aboutSection.style.transform = 'translateX(-100%)';
+    aboutSection.style.opacity = '0';
+    
+    visionSection.style.transform = 'translateX(100%)';
+    visionSection.style.opacity = '0';
+
+    window.addEventListener('scroll', debounce(() => {
+        requestAnimationFrame(checkPosition);
+    }));
+
+    checkPosition(); // Sayfa yüklendiğinde hemen kontrol et
+});
+
+
+</script>
+
+{% endblock %}

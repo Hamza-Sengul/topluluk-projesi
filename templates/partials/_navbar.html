@@ -1,0 +1,33 @@
+<nav>
+  <div class="navcont">
+    <div class="navlogo">
+      <a href="#"><img src="{{ site_content.logo.url }}" alt="logo" width="150px" /></a>
+    </div>
+
+    <input type="checkbox" name="menu" id="menu" />
+    <label for="menu" id="menu2">
+      <i class="fa-solid fa-bars"></i>
+    </label>
+
+    <div class="navmenuler">
+      <ul>
+        <li><a href="{% url 'home' %}">AnaSayfa</a></li>
+        <li><a href="#">Etkinliklerimiz</a></li>
+        <li><a href="#">Projelerimiz</a></li>
+        <li><a href="#">Hakkımızda</a></li>
+        <li>
+          <a href="#"
+            >Bütün Topluluklar <i class="fa-solid fa-caret-down"></i
+          ></a>
+          <div class="altmenu">
+            <ul>
+              {% for community in communities %}
+              <li><a href="{% url 'community_page' community.name %}">{{ community.name }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
