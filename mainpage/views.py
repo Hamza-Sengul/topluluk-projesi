@@ -62,28 +62,31 @@ def announcement_detail(request, announcement_id):
         'details': announcement.details,
         'certificate_available': certificate_available,
     })
+from django.http import FileResponse, Http404
+from .models import Certificate
+
 def certificate_page(request, announcement_id):
-    site_content = SiteContent.objects.first()
     if request.method == "POST":
         email = request.POST.get("email")
 
-        # Eksik email kontrolü
         if not email:
             return HttpResponse("Eksik email veya duyuru kimliği.", status=400)
 
         # Sertifikayı bulma
         certificate = Certificate.objects.filter(announcement_id=announcement_id, email=email).first()
         if certificate:
-            # Sertifika bulunduysa görseli ve indirme butonunu gösteren bir sayfa render edilir
-            return render(request, "certificate_display.html", {
-                "certificate_url": certificate.certificate_image.url,
-                 'site_content': site_content
-            })
+            # Dosyayı `rb` modunda açarak okunabilir hale getirme
+            try:
+                response = FileResponse(certificate.certificate_image.open('rb'), as_attachment=True, filename=f"sertifika_{announcement_id}.jpg")
+                return response
+            except Exception as e:
+                print("Error:", e)
+                raise Http404("Sertifika bulunamadı veya açılamadı.")
         else:
             return HttpResponse("E-posta kayıtlarımızla eşleşmiyor.", status=404)
 
-    # GET isteğinde formu gösteren sayfa render edilir
-    return render(request, "certificate.html", {"announcement_id": announcement_id, 'site_content': site_content})
+    return render(request, "certificate.html", {"announcement_id": announcement_id})
+
 
 
 from django.http import HttpResponse, FileResponse
